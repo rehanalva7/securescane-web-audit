@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureScan Web Audit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="SecureScan Web Audit">
+        <span class="brand-mark">S</span>
+        <span>SecureScan</span>
+      </a>
+      <nav class="nav-links" aria-label="Navigasi utama">
+        <a href="#scanner">Scanner</a>
+        <a href="#result">Result</a>
+        <a href="#dashboard">Dashboard</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Website Security Scanner</p>
+          <h1>Audit keamanan website dalam satu dashboard sederhana.</h1>
+          <p class="hero-copy">
+            SecureScan membantu menemukan indikasi SQL Injection, XSS, CSRF,
+            JWT issue, security header, HTTPS, cookie session, dan informasi server
+            dasar sebelum masalah makin besar.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#scanner">Mulai Scan</a>
+            <a class="secondary-button" href="#dashboard">Lihat Monitoring</a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-label="Ringkasan keamanan">
+          <div class="panel-top">
+            <span>Live Audit</span>
+            <strong>86%</strong>
+          </div>
+          <div class="score-ring">
+            <span>Security Score</span>
+            <strong id="heroScore">A-</strong>
+          </div>
+          <div class="mini-grid">
+            <div>
+              <small>Header</small>
+              <b>Passed</b>
+            </div>
+            <div>
+              <small>HTTPS</small>
+              <b>Valid</b>
+            </div>
+            <div>
+              <small>Cookie</small>
+              <b>Warning</b>
+            </div>
+            <div>
+              <small>XSS</small>
+              <b>Clean</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scanner" class="section scanner-section">
+        <div class="section-heading">
+          <p class="eyebrow">Scanner Page</p>
+          <h2>Masukkan URL website</h2>
+          <p>Validasi URL aktif, simulasi crawling internal page, lalu tampilkan hasil audit.</p>
+        </div>
+
+        <form class="scan-form" id="scanForm">
+          <label for="targetUrl">Target URL</label>
+          <div class="input-row">
+            <input id="targetUrl" type="url" placeholder="https://example.com" required />
+            <button type="submit">Scan Website</button>
+          </div>
+          <p class="form-hint" id="formHint">Gunakan format lengkap, contoh: https://domain.com</p>
+        </form>
+
+        <div class="scan-progress" id="scanProgress" aria-live="polite">
+          <div class="progress-header">
+            <span id="progressText">Menunggu URL</span>
+            <strong id="progressPercent">0%</strong>
+          </div>
+          <div class="progress-track">
+            <span id="progressBar"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="result" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Result Page</p>
+          <h2>Hasil audit keamanan</h2>
