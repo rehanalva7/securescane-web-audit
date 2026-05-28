@@ -29,46 +29,14 @@ const scanSteps = [
 ];
 
 const auditChecks = [
-  {
-    title: "SQL Injection Scanner",
-    type: "success",
-    detail: "Tidak ditemukan pola query parameter berisiko tinggi."
-  },
-  {
-    title: "XSS Scanner",
-    type: "success",
-    detail: "Input reflection dasar tidak terdeteksi pada halaman crawled."
-  },
-  {
-    title: "JWT Security Test",
-    type: "warning",
-    detail: "Pastikan token memiliki expiry singkat dan algoritma signing kuat."
-  },
-  {
-    title: "CSRF Audit",
-    type: "warning",
-    detail: "Beberapa form perlu diverifikasi memiliki CSRF token."
-  },
-  {
-    title: "Security Header Check",
-    type: "danger",
-    detail: "Content-Security-Policy belum terlihat pada simulasi response."
-  },
-  {
-    title: "HTTPS Validation",
-    type: "success",
-    detail: "URL menggunakan HTTPS dan siap divalidasi oleh backend."
-  },
-  {
-    title: "Session Cookie Audit",
-    type: "info",
-    detail: "Cookie perlu dicek untuk flag HttpOnly, Secure, dan SameSite."
-  },
-  {
-    title: "Admin Panel Discovery",
-    type: "info",
-    detail: "Endpoint umum seperti /admin dan /login disiapkan untuk discovery."
-  }
+  { title: "SQL Injection Scanner", type: "success", detail: "Tidak ditemukan pola query parameter berisiko tinggi." },
+  { title: "XSS Scanner", type: "success", detail: "Input reflection dasar tidak terdeteksi pada halaman crawled." },
+  { title: "JWT Security Test", type: "warning", detail: "Pastikan token memiliki expiry singkat dan algoritma signing kuat." },
+  { title: "CSRF Audit", type: "warning", detail: "Beberapa form perlu diverifikasi memiliki CSRF token." },
+  { title: "Security Header Check", type: "danger", detail: "Content-Security-Policy belum terlihat pada simulasi response." },
+  { title: "HTTPS Validation", type: "success", detail: "URL menggunakan HTTPS dan siap divalidasi oleh backend." },
+  { title: "Session Cookie Audit", type: "info", detail: "Cookie perlu dicek untuk flag HttpOnly, Secure, dan SameSite." },
+  { title: "Admin Panel Discovery", type: "info", detail: "Endpoint umum seperti /admin dan /login disiapkan untuk discovery." }
 ];
 
 function isValidUrl(value) {
@@ -99,3 +67,90 @@ function renderChecks() {
     )
     .join("");
 }
+
+function completeScan(url) {
+  const score = 82 + Math.floor(Math.random() * 9);
+  const crawled = 12 + Math.floor(Math.random() * 18);
+
+  latestReport = { url, score, crawled, checks: auditChecks };
+
+  heroScore.textContent = score >= 88 ? "A" : "B+";
+  riskLevel.textContent = "Medium";
+  riskDescription.textContent = "Website cukup baik, tetapi masih perlu peningkatan pada security header, CSRF validation, dan hardening session.";
+  resultSummary.textContent = `Scan selesai untuk ${url}. ${crawled} halaman berhasil dicrawling dengan skor keamanan ${score}%.`;
+  exportReport.disabled = false;
+
+  renderChecks();
+
+  scanCount += 1;
+  totalScan.textContent = scanCount;
+  highIssues.textContent = "1";
+  pagesCrawled.textContent = crawled;
+
+  historyTable.innerHTML = `
+    <tr>
+      <td>${url}</td>
+      <td>${score}%</td>
+      <td>Medium</td>
+      <td>Completed</td>
+    </tr>
+  `;
+
+  document.querySelector("#result").scrollIntoView({ behavior: "smooth" });
+}
+
+scanForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const url = targetUrl.value.trim();
+
+  if (!isValidUrl(url)) {
+    formHint.textContent = "URL belum valid. Gunakan http:// atau https:// di awal alamat.";
+    formHint.style.color = "#cf3b3b";
+    return;
+  }
+
+  formHint.textContent = "URL valid. Scan sedang berjalan.";
+  formHint.style.color = "#178c62";
+  exportReport.disabled = true;
+
+  let index = 0;
+  setProgress(0, scanSteps[index]);
+
+  const timer = setInterval(function () {
+    index += 1;
+    const percent = Math.min(100, Math.round((index / scanSteps.length) * 100));
+    const label = scanSteps[Math.min(index, scanSteps.length - 1)];
+
+    setProgress(percent, label);
+
+    if (percent === 100) {
+      clearInterval(timer);
+      setTimeout(function () {
+        completeScan(url);
+      }, 350);
+    }
+  }, 420);
+});
+
+exportReport.addEventListener("click", function () {
+  if (!latestReport) return;
+
+  const lines = [
+    "SecureScan Web Audit Report",
+    `Target: ${latestReport.url}`,
+    `Security Score: ${latestReport.score}%`,
+    `Pages Crawled: ${latestReport.crawled}`,
+    "",
+    "Audit Findings:",
+    ...latestReport.checks.map((item) => `- ${item.title}: ${item.detail}`)
+  ];
+
+  const reportWindow = window.open("", "_blank");
+  reportWindow.document.write(`
+    <title>SecureScan Report</title>
+    <pre style="font: 14px/1.6 Arial, sans-serif; white-space: pre-wrap; padding: 32px;">${lines.join("\n")}</pre>
+    <script>window.print();<\/script>
+  `);
+  reportWindow.document.close();
+});
