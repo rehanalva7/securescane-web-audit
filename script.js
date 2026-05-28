@@ -154,3 +154,57 @@ exportReport.addEventListener("click", function () {
   `);
   reportWindow.document.close();
 });
+exportReport.addEventListener(
+  "click",
+  function (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    if (!latestReport) {
+      alert("Jalankan scan terlebih dahulu.");
+      return;
+    }
+
+    const oldReport = document.querySelector("#printReport");
+    if (oldReport) oldReport.remove();
+
+    const report = document.createElement("section");
+    report.id = "printReport";
+    report.innerHTML = `
+      <h1>SecureScan Web Audit Report</h1>
+      <p><strong>Target:</strong> ${latestReport.url}</p>
+      <p><strong>Security Score:</strong> ${latestReport.score}%</p>
+      <p><strong>Pages Crawled:</strong> ${latestReport.crawled}</p>
+      <h2>Audit Findings</h2>
+      <ul>
+        ${latestReport.checks
+          .map((item) => `<li><strong>${item.title}</strong>: ${item.detail}</li>`)
+          .join("")}
+      </ul>
+    `;
+
+    document.body.appendChild(report);
+
+    const style = document.createElement("style");
+    style.id = "printStyle";
+    style.innerHTML = `
+      #printReport { display: none; }
+      @media print {
+        body > *:not(#printReport) { display: none !important; }
+        #printReport {
+          display: block;
+          padding: 32px;
+          font-family: Arial, sans-serif;
+          color: #111;
+        }
+        #printReport h1 { font-size: 28px; margin-bottom: 18px; }
+        #printReport h2 { font-size: 20px; margin-top: 24px; }
+        #printReport p, #printReport li { font-size: 14px; line-height: 1.6; }
+      }
+    `;
+
+    document.head.appendChild(style);
+    window.print();
+  },
+  true
+);
